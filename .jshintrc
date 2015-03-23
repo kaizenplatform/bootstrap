@@ -13,6 +13,7 @@
   "jquery": true,
   "globals": {
     "angular": false,
+    "require": false,
 
     // For Jasmine
     "after"      : false,
