@@ -1,4 +1,3 @@
-
 /**
  * @ngdoc overview
  * @name ui.bootstrap.tabs
@@ -11,7 +10,10 @@ angular.module('ui.bootstrap.tabs', [])
 
 .controller('TabsetController', ['$scope', function TabsetCtrl($scope) {
   var ctrl = this,
-      tabs = ctrl.tabs = $scope.tabs = [];
+      tabs = ctrl.tabs = $scope.tabs = [],
+      tabsetHeaders = ctrl.tabsetHeaders = $scope.tabsetHeaders = {
+          append: [], prepend: []
+      };
 
   ctrl.select = function(selectedTab) {
     angular.forEach(tabs, function(tab) {
@@ -28,10 +30,13 @@ angular.module('ui.bootstrap.tabs', [])
     tabs.push(tab);
     // we can't run the select function on the first tab
     // since that would select it twice
-    if (tabs.length === 1) {
+    if (tabs.length === 1 && tab.active !== false) {
       tab.active = true;
     } else if (tab.active) {
       ctrl.select(tab);
+    }
+    else {
+      tab.active = false;
     }
   };
 
@@ -88,10 +93,25 @@ angular.module('ui.bootstrap.tabs', [])
     transclude: true,
     replace: true,
     scope: {
-      type: '@'
+      type: '@',
+      fixed: '@'
     },
     controller: 'TabsetController',
     templateUrl: 'template/tabs/tabset.html',
+    compile: function(elm, attrs, transclude) {
+      return function postLink(scope, elm, attrs, tabCtrl) {
+        var list = elm.find('ul')
+          , wrapper = angular.element(list.parent()[0])
+          , i, node
+          ;
+        for(i = 0; i < tabCtrl.tabsetHeaders.prepend.length; i++) {
+          wrapper.prepend(tabCtrl.tabsetHeaders.prepend[i]);
+        }
+        for(i = 0; i < tabCtrl.tabsetHeaders.append.length; i++) {
+          wrapper.append(tabCtrl.tabsetHeaders.append[i]);
+        }
+      }
+    },
     link: function(scope, element, attrs) {
       scope.vertical = angular.isDefined(attrs.vertical) ? scope.$parent.$eval(attrs.vertical) : false;
       scope.justified = angular.isDefined(attrs.justified) ? scope.$parent.$eval(attrs.justified) : false;
@@ -179,7 +199,29 @@ angular.module('ui.bootstrap.tabs', [])
   </file>
 </example>
  */
-.directive('tab', ['$parse', function($parse) {
+.directive('tabsetHeading', ['$parse', function($parse) {
+  return {
+    require: '^tabset',
+    restrict: 'EA',
+    replace: true,
+    templateUrl: 'template/tabs/tabset-heading.html',
+    transclude: true,
+    scope: {},
+    controller: function() {
+      //Empty controller so other directives can require being 'under' a tab
+    },
+    compile: function(elm, attrs, transclude) {
+      return function postLink(scope, elm, attrs, tabsetCtrl) {
+        if(attrs.prepend === 'true')
+          tabsetCtrl.tabsetHeaders.prepend.push(elm);
+        else
+          tabsetCtrl.tabsetHeaders.append.push(elm);
+        elm.detach();
+      }
+    }
+  }
+}])
+.directive('tab', ['$parse', '$log', function($parse, $log) {
   return {
     require: '^tabset',
     restrict: 'EA',
@@ -205,7 +247,18 @@ angular.module('ui.bootstrap.tabs', [])
         });
 
         scope.disabled = false;
+        if ( attrs.disable ) {
+          scope.$parent.$watch($parse(attrs.disable), function(value) {
+            scope.disabled = !! value;
+          });
+        }
+
+        // Deprecation support of "disabled" parameter
+        // fix(tab): IE9 disabled attr renders grey text on enabled tab #2677
+        // This code is duplicated from the lines above to make it easy to remove once
+        // the feature has been completely deprecated
         if ( attrs.disabled ) {
+          $log.warn('Use of "disabled" attribute has been deprecated, please use "disable"');
           scope.$parent.$watch($parse(attrs.disabled), function(value) {
             scope.disabled = !! value;
           });
