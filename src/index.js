@@ -1,0 +1,43 @@
+require('./accordion/accordion');
+require('./alert/alert');
+require('./bindHtml/bindHtml');
+require('./buttons/buttons');
+require('./carousel/carousel');
+require('./collapse/collapse');
+require('./dateparser/dateparser');
+require('./datepicker/datepicker');
+require('./dropdown/dropdown');
+require('./modal/modal');
+require('./pagination/pagination');
+require('./popover/popover');
+require('./position/position');
+require('./progressbar/progressbar');
+require('./rating/rating');
+require('./tabs/tabs');
+require('./timepicker/timepicker');
+require('./tooltip/tooltip');
+require('./transition/transition');
+require('./typeahead/typeahead');
+
+angular.module('ui.bootstrap', [
+  'ui.bootstrap.transition',
+  'ui.bootstrap.collapse',
+  'ui.bootstrap.accordion',
+  'ui.bootstrap.alert',
+  'ui.bootstrap.bindHtml',
+  'ui.bootstrap.buttons',
+  'ui.bootstrap.carousel',
+  'ui.bootstrap.dateparser',
+  'ui.bootstrap.position',
+  'ui.bootstrap.datepicker',
+  'ui.bootstrap.dropdown',
+  'ui.bootstrap.modal',
+  'ui.bootstrap.pagination',
+  'ui.bootstrap.tooltip',
+  'ui.bootstrap.popover',
+  'ui.bootstrap.progressbar',
+  'ui.bootstrap.rating',
+  'ui.bootstrap.tabs',
+  'ui.bootstrap.timepicker',
+  'ui.bootstrap.typeahead'
+]);
